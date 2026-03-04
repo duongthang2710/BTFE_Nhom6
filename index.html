@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>PTIT - Trang Bài Thi</title>
+	<style>
+		:root {
+			--ptit-red: #b2002d;
+			--ptit-red-dark: #860022;
+			--bg: #f3f5f9;
+			--card: #ffffff;
+			--ok: #1f9d55;
+			--bad: #d64545;
+			--text: #1f2937;
+			--muted: #6b7280;
+			--line: #e5e7eb;
+		}
+		* { box-sizing: border-box; }
+		body {
+			margin: 0;
+			font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+			color: var(--text);
+			background: var(--bg);
+		}
+		.header {
+			position: sticky;
+			top: 0;
+			z-index: 50;
+			background: linear-gradient(135deg, var(--ptit-red), var(--ptit-red-dark));
+			color: #fff;
+			padding: 14px 24px;
+			box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+		}
+		.header-wrap {
+			max-width: 1100px;
+			margin: 0 auto;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 16px;
+		}
+		.title { font-weight: 700; font-size: 20px; }
+		.sub { opacity: 0.9; font-size: 13px; margin-top: 2px; }
+		.timer {
+			background: rgba(255,255,255,0.18);
+			border: 1px solid rgba(255,255,255,0.25);
+			border-radius: 12px;
+			padding: 8px 14px;
+			min-width: 140px;
+			text-align: center;
+			font-weight: 700;
+			letter-spacing: 0.5px;
+		}
+		.timer.warn { background: rgba(255, 193, 7, 0.9); color: #111827; }
+		.timer.danger { background: rgba(220, 53, 69, 0.95); }
+		.layout {
+			max-width: 1100px;
+			margin: 22px auto;
+			padding: 0 16px;
+			display: grid;
+			grid-template-columns: 1fr 300px;
+			gap: 18px;
+		}
+		.card {
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: 14px;
+			box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+		}
+		.question-head {
+			padding: 16px 18px;
+			border-bottom: 1px solid var(--line);
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 12px;
+		}
+		.badge {
+			font-size: 12px;
+			border-radius: 999px;
+			padding: 4px 10px;
+			font-weight: 600;
+			background: #f3f4f6;
+			color: #374151;
+		}
+		.badge.ok { background: #e8f7ef; color: #0f7c3a; }
+		.question-body { padding: 18px; }
+		.question-text { font-size: 18px; margin: 0 0 14px; line-height: 1.5; }
+		.opts { display: grid; gap: 10px; }
+		.opt {
+			border: 1px solid var(--line);
+			border-radius: 10px;
+			padding: 12px;
+			cursor: pointer;
+			display: flex;
+			gap: 10px;
+			align-items: flex-start;
+			transition: all .2s ease;
+		}
+		.opt:hover { border-color: var(--ptit-red); background: #fff7f9; }
+		.opt.active { border-color: var(--ptit-red); background: #fff1f4; }
+		.letter {
+			width: 24px;
+			height: 24px;
+			border-radius: 50%;
+			background: #e5e7eb;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: 700;
+			font-size: 12px;
+			flex-shrink: 0;
+			margin-top: 1px;
+		}
+		.opt.active .letter { background: var(--ptit-red); color: #fff; }
+		.q-nav {
+			border-top: 1px solid var(--line);
+			padding: 14px 18px;
+			display: flex;
+			justify-content: space-between;
+			gap: 10px;
+		}
+		.btn {
+			border: none;
+			border-radius: 10px;
+			padding: 10px 14px;
+			cursor: pointer;
+			font-weight: 600;
+		}
+		.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+		.btn-primary { background: var(--ptit-red); color: #fff; }
+		.btn-secondary { background: #e5e7eb; color: #111827; }
+		.btn-success { background: var(--ok); color: #fff; }
+		.sidebar-box { padding: 16px; margin-bottom: 14px; }
+		.sidebar-title { font-weight: 700; margin-bottom: 10px; }
+		.progress {
+			height: 10px;
+			background: #e5e7eb;
+			border-radius: 999px;
+			overflow: hidden;
+		}
+		.progress > div {
+			height: 100%;
+			width: 0;
+			background: linear-gradient(90deg, #1f9d55, #22c55e);
+			transition: width .2s ease;
+		}
+		.grid {
+			display: grid;
+			grid-template-columns: repeat(5, 1fr);
+			gap: 8px;
+		}
+		.q-item {
+			text-align: center;
+			padding: 8px 0;
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			cursor: pointer;
+			user-select: none;
+			font-weight: 600;
+		}
+		.q-item.current { background: var(--ptit-red); color: #fff; border-color: var(--ptit-red); }
+		.q-item.done { background: #e8f7ef; color: #0f7c3a; border-color: #a7e1c0; }
+		.q-item.current.done { background: #0f7c3a; color: #fff; border-color: #0f7c3a; }
+		.overlay {
+			position: fixed;
+			inset: 0;
+			background: rgba(0,0,0,0.55);
+			display: none;
+			align-items: center;
+			justify-content: center;
+			z-index: 100;
+			padding: 16px;
+		}
+		.overlay.active { display: flex; }
+		.modal {
+			max-width: 450px;
+			width: 100%;
+			background: #fff;
+			border-radius: 14px;
+			padding: 18px;
+			border: 1px solid var(--line);
+		}
+		.modal h3 { margin-top: 0; }
+		.note { color: var(--muted); font-size: 14px; }
+		.summary-row {
+			display: flex;
+			justify-content: space-between;
+			padding: 8px 0;
+			border-bottom: 1px dashed #e5e7eb;
+			font-size: 14px;
+		}
+		.summary-row:last-child { border-bottom: none; }
+		.modal-actions { display: flex; gap: 10px; margin-top: 12px; }
+		.toast {
+			position: fixed;
+			right: 16px;
+			bottom: 16px;
+			background: #111827;
+			color: #fff;
+			padding: 12px 14px;
+			border-radius: 10px;
+			display: none;
+			z-index: 200;
+		}
+		.toast.show { display: block; }
+		@media (max-width: 900px) {
+			.layout { grid-template-columns: 1fr; }
+			.header-wrap { flex-direction: column; align-items: flex-start; }
+		}
+	</style>
+</head>
+<body>
+	<header class="header">
+		<div class="header-wrap">
+			<div>
+				<div class="title">PTIT - Hệ thống Thi Trắc Nghiệm</div>
+				<div class="sub" id="examInfo">Bài thi: Lập trình Web cơ bản</div>
+			</div>
+			<div class="timer" id="timer">20:00</div>
+		</div>
+	</header>
+
+	<main class="layout">
+		<section class="card" id="questionCard"></section>
+
+		<aside>
+			<div class="card sidebar-box">
+				<div class="sidebar-title">Tiến độ làm bài</div>
+				<div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:8px;">
+					<span>Đã trả lời: <strong id="doneCount">0</strong>/<span id="totalCount">0</span></span>
+					<span id="donePercent">0%</span>
+				</div>
+				<div class="progress"><div id="progressBar"></div></div>
+			</div>
+			<div class="card sidebar-box">
+				<div class="sidebar-title">Danh sách câu hỏi</div>
+				<div class="grid" id="qGrid"></div>
+			</div>
+			<button class="btn btn-success" style="width:100%;" id="submitBtn">Nộp bài</button>
+		</aside>
+	</main>
+
+	<div class="overlay" id="submitOverlay">
+		<div class="modal">
+			<h3>Xác nhận nộp bài</h3>
+			<p class="note">Bạn có chắc chắn muốn nộp bài? Sau khi nộp sẽ không sửa được đáp án.</p>
+			<div id="submitSummary"></div>
+			<div class="modal-actions">
+				<button class="btn btn-secondary" id="cancelSubmit">Quay lại</button>
+				<button class="btn btn-primary" id="confirmSubmit">Nộp bài ngay</button>
+			</div>
+		</div>
+	</div>
+
+	<div class="overlay" id="noticeOverlay">
+		<div class="modal">
+			<h3 id="noticeTitle">Thông báo</h3>
+			<p class="note" id="noticeText"></p>
+			<div class="modal-actions">
+				<button class="btn btn-primary" id="goResultBtn">Xem kết quả</button>
+			</div>
+		</div>
+	</div>
+
+	<div class="toast" id="toast"></div>
+
+	<script>
+		const exam = {
+			id: "PTIT-WEB-01",
+			title: "Bài thi Lập trình Web - PTIT",
+			subject: "Lập trình Web",
+			durationSec: 20 * 60
+		};
+
+		const questions = [
+			{
+				id: 1,
+				topic: "HTML",
+				text: "HTML là viết tắt của cụm nào?",
+				options: [
+					"Hyper Text Markup Language",
+					"High Tool Machine Language",
+					"Hyperlinks and Text Management Language",
+					"Home Tool Markup Language"
+				],
+				correct: 0,
+				explain: "HTML là Hyper Text Markup Language."
+			},
+			{
+				id: 2,
+				topic: "CSS",
+				text: "Thuộc tính CSS nào dùng để đổi màu chữ?",
+				options: ["font-color", "text-color", "color", "foreground"],
+				correct: 2,
+				explain: "Thuộc tính đúng là color."
+			},
+			{
+				id: 3,
+				topic: "JavaScript",
+				text: "Phương thức nào lấy phần tử theo id?",
+				options: ["getElementById", "queryById", "selectById", "findElement"],
+				correct: 0,
+				explain: "Dùng document.getElementById()."
+			},
+			{
+				id: 4,
+				topic: "HTML",
+				text: "Thẻ nào dùng để tạo liên kết?",
+				options: ["<link>", "<a>", "<href>", "<url>"],
+				correct: 1,
+				explain: "Thẻ anchor <a> tạo hyperlink."
+			},
+			{
+				id: 5,
+				topic: "JavaScript",
+				text: "Khai báo nào hợp lệ trong ES6?",
+				options: ["var", "let", "const", "Cả 3 đáp án"],
+				correct: 3,
+				explain: "ES6 hỗ trợ var, let và const."
+			}
+		];
+
+		let current = 0;
+		let answers = {};
+		let left = exam.durationSec;
+		let timer = null;
+		let submitted = false;
+
+		const timerEl = document.getElementById("timer");
+		const questionCard = document.getElementById("questionCard");
+		const qGrid = document.getElementById("qGrid");
+		const doneCountEl = document.getElementById("doneCount");
+		const donePercentEl = document.getElementById("donePercent");
+		const totalCountEl = document.getElementById("totalCount");
+		const progressBar = document.getElementById("progressBar");
+
+		document.getElementById("examInfo").textContent = `Bài thi: ${exam.title}`;
+		totalCountEl.textContent = questions.length;
+
+		function formatTime(totalSec) {
+			const m = Math.floor(totalSec / 60).toString().padStart(2, "0");
+			const s = (totalSec % 60).toString().padStart(2, "0");
+			return `${m}:${s}`;
+		}
+
+		function showToast(message) {
+			const toast = document.getElementById("toast");
+			toast.textContent = message;
+			toast.classList.add("show");
+			setTimeout(() => toast.classList.remove("show"), 1800);
+		}
+
+		function renderQuestion() {
+			const q = questions[current];
+			const selected = answers[q.id];
+			questionCard.innerHTML = `
+				<div class="question-head">
+					<strong>Câu ${current + 1}/${questions.length}</strong>
+					<span class="badge ${selected !== undefined ? "ok" : ""}">${selected !== undefined ? "Đã trả lời" : "Chưa trả lời"}</span>
+				</div>
+				<div class="question-body">
+					<p class="question-text">${q.text}</p>
+					<div class="opts">
+						${q.options.map((opt, idx) => `
+							<label class="opt ${selected === idx ? "active" : ""}" data-opt="${idx}">
+								<span class="letter">${String.fromCharCode(65 + idx)}</span>
+								<span>${opt}</span>
+							</label>
+						`).join("")}
+					</div>
+				</div>
+				<div class="q-nav">
+					<button class="btn btn-secondary" id="prevBtn" ${current === 0 ? "disabled" : ""}>Câu trước</button>
+					<button class="btn btn-primary" id="nextBtn" ${current === questions.length - 1 ? "disabled" : ""}>Câu tiếp</button>
+				</div>
+			`;
+
+			questionCard.querySelectorAll(".opt").forEach(node => {
+				node.addEventListener("click", () => {
+					if (submitted) return;
+					answers[q.id] = Number(node.dataset.opt);
+					renderQuestion();
+					renderGrid();
+					renderProgress();
+				});
+			});
+
+			document.getElementById("prevBtn").addEventListener("click", () => {
+				if (current > 0) {
+					current -= 1;
+					renderQuestion();
+					renderGrid();
+				}
+			});
+			document.getElementById("nextBtn").addEventListener("click", () => {
+				if (current < questions.length - 1) {
+					current += 1;
+					renderQuestion();
+					renderGrid();
+				}
+			});
+		}
+
+		function renderGrid() {
+			qGrid.innerHTML = questions.map((q, idx) => {
+				const done = answers[q.id] !== undefined;
+				const classes = ["q-item", idx === current ? "current" : "", done ? "done" : ""].join(" ");
+				return `<div class="${classes}" data-idx="${idx}">${idx + 1}</div>`;
+			}).join("");
+
+			qGrid.querySelectorAll(".q-item").forEach(node => {
+				node.addEventListener("click", () => {
+					current = Number(node.dataset.idx);
+					renderQuestion();
+					renderGrid();
+				});
+			});
+		}
+
+		function renderProgress() {
+			const done = Object.keys(answers).length;
+			const percent = Math.round((done / questions.length) * 100);
+			doneCountEl.textContent = done;
+			donePercentEl.textContent = `${percent}%`;
+			progressBar.style.width = `${percent}%`;
+		}
+
+		function saveResult(reason) {
+			const detail = questions.map(q => {
+				const selected = answers[q.id] !== undefined ? answers[q.id] : null;
+				return {
+					questionId: q.id,
+					topic: q.topic,
+					text: q.text,
+					options: q.options,
+					correctAnswer: q.correct,
+					selectedAnswer: selected,
+					isCorrect: selected === q.correct,
+					explain: q.explain
+				};
+			});
+
+			const correct = detail.filter(x => x.isCorrect).length;
+			const wrong = questions.length - correct;
+			const score10 = Number(((correct / questions.length) * 10).toFixed(2));
+
+			const topicMap = {};
+			detail.forEach(d => {
+				if (!topicMap[d.topic]) topicMap[d.topic] = { total: 0, correct: 0 };
+				topicMap[d.topic].total += 1;
+				if (d.isCorrect) topicMap[d.topic].correct += 1;
+			});
+
+			const result = {
+				examId: exam.id,
+				examTitle: exam.title,
+				subject: exam.subject,
+				totalQuestions: questions.length,
+				correct,
+				wrong,
+				score10,
+				scorePercent: Number(((correct / questions.length) * 100).toFixed(2)),
+				submittedAt: new Date().toISOString(),
+				timeUsedSec: exam.durationSec - left,
+				durationSec: exam.durationSec,
+				submitReason: reason,
+				detail,
+				topicStats: topicMap,
+				classStats: {
+					averagePercent: 72,
+					maxPercent: 96,
+					minPercent: 38
+				}
+			};
+
+			localStorage.setItem("fe01_exam_result", JSON.stringify(result));
+			return result;
+		}
+
+		function showNotice(title, text) {
+			document.getElementById("noticeTitle").textContent = title;
+			document.getElementById("noticeText").textContent = text;
+			document.getElementById("noticeOverlay").classList.add("active");
+		}
+
+		function submitExam(reason) {
+			if (submitted) return;
+			submitted = true;
+			clearInterval(timer);
+			saveResult(reason);
+			showNotice("Đã nộp bài", reason);
+		}
+
+		function updateTimer() {
+			timerEl.textContent = formatTime(left);
+			timerEl.classList.remove("warn", "danger");
+			if (left <= 300 && left > 60) timerEl.classList.add("warn");
+			if (left <= 60) timerEl.classList.add("danger");
+
+			if (left <= 0) {
+				submitExam("Hết thời gian làm bài. Hệ thống đã tự động nộp bài.");
+				return;
+			}
+			left -= 1;
+		}
+
+		function openSubmitModal() {
+			if (submitted) return;
+			const done = Object.keys(answers).length;
+			const remain = questions.length - done;
+			document.getElementById("submitSummary").innerHTML = `
+				<div class="summary-row"><span>Tổng số câu</span><strong>${questions.length}</strong></div>
+				<div class="summary-row"><span>Đã trả lời</span><strong>${done}</strong></div>
+				<div class="summary-row"><span>Chưa trả lời</span><strong>${remain}</strong></div>
+				<div class="summary-row"><span>Thời gian còn lại</span><strong>${formatTime(left)}</strong></div>
+			`;
+			document.getElementById("submitOverlay").classList.add("active");
+		}
+
+		document.getElementById("submitBtn").addEventListener("click", openSubmitModal);
+		document.getElementById("cancelSubmit").addEventListener("click", () => {
+			document.getElementById("submitOverlay").classList.remove("active");
+		});
+		document.getElementById("confirmSubmit").addEventListener("click", () => {
+			document.getElementById("submitOverlay").classList.remove("active");
+			submitExam("Nộp bài thành công.");
+		});
+		document.getElementById("goResultBtn").addEventListener("click", () => {
+			window.location.href = "results.html";
+		});
+
+		renderQuestion();
+		renderGrid();
+		renderProgress();
+		updateTimer();
+		timer = setInterval(updateTimer, 1000);
+
+		showToast("Bài thi đã sẵn sàng");
+	</script>
+</body>
+</html>
