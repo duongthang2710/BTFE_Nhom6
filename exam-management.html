@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Kỳ thi - Hệ thống Thi Trắc nghiệm PTIT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Navbar -->
+        <nav class="navbar" id="navbar">
+            <div class="navbar-left">
+                <div class="navbar-brand">
+                    <div>
+                        <div class="logo-text">PTIT - Hệ thống Thi Trắc Nghiệm</div>
+                    </div>
+                </div>
+            </div>
+            <div class="navbar-right">
+                <a href="#" class="logout-link" data-logout="admin">Đăng xuất</a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title"><i class="fas fa-file-alt"></i> Quản lý Kỳ thi</h1>
+                <div class="btn-group">
+                    <a class="btn btn-outline btn-sm" href="admin-dashboard.html"><i class="fas fa-th-large"></i> Trang quản trị</a>
+                    <a class="btn btn-outline btn-sm" href="exam-management.html"><i class="fas fa-file-alt"></i> Quản lý kỳ thi</a>
+                    <a class="btn btn-outline btn-sm" href="results-management.html"><i class="fas fa-users"></i> Kết quả sinh viên</a>
+                    <a class="btn btn-outline btn-sm" href="admin-statistics.html"><i class="fas fa-chart-bar"></i> Thống kê</a>
+                </div>
+            </div>
+
+            <!-- Page Content -->
+            <div class="page-content">
+                <!-- Tabs: Danh sách kỳ thi / Tạo kỳ thi mới -->
+                <div class="tabs">
+                    <div class="tab active" data-tab="exam-list">
+                        <i class="fas fa-list"></i> Danh sách Kỳ thi
+                    </div>
+                    <div class="tab" data-tab="create-exam">
+                        <i class="fas fa-plus-circle"></i> Tạo Kỳ thi mới
+                    </div>
+                    <div class="tab" data-tab="student-list">
+                        <i class="fas fa-users"></i> Quản lý Sinh viên
+                    </div>
+                </div>
+
+                <!-- Tab 1: Danh sách kỳ thi -->
+                <div class="tab-content active" id="exam-list">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-file-alt"></i> Danh sách Kỳ thi</h3>
+                            <div class="d-flex gap-1">
+                                <div class="search-box">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" class="form-control" id="searchExam" placeholder="Tìm kiếm kỳ thi...">
+                                </div>
+                                <button class="btn btn-primary" onclick="switchTab('create-exam')">
+                                    <i class="fas fa-plus"></i> Tạo mới
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>STT</th>
+                                            <th>Tên kỳ thi</th>
+                                            <th>Thời gian làm bài</th>
+                                            <th>Thời gian bắt đầu</th>
+                                            <th>Phòng thi</th>
+                                            <th>Trạng thái</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="examTableBody">
+                                        <!-- Rendered by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="pagination" id="examPagination">
+                                <!-- Rendered by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Tạo/Chỉnh sửa kỳ thi -->
+                <div class="tab-content" id="create-exam">
+                    <!-- Exam Info Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-info-circle"></i> Thông tin Kỳ thi</h3>
+                        </div>
+                        <div class="card-body">
+                            <form id="examForm">
+                                <input type="hidden" id="examId" value="">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Tên kỳ thi <span class="required">*</span></label>
+                                        <input type="text" class="form-control" id="examName" placeholder="Nhập tên kỳ thi..." required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Loại kỳ thi <span class="required">*</span></label>
+                                        <select class="form-control" id="examType">
+                                            <option value="free">Tự do (không giới hạn thời gian)</option>
+                                            <option value="scheduled">Thời gian cụ thể</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Nhóm kỳ thi <span class="required">*</span></label>
+                                    <select class="form-control" id="examCategory">
+                                        <option value="practice">Luyện tập</option>
+                                        <option value="midterm">Giữa kỳ</option>
+                                        <option value="final">Cuối kỳ</option>
+                                        <option value="other">Khác</option>
+                                    </select>
+                                </div>
+                                <div class="form-row" id="timedFields" style="display: none;">
+                                    <div class="form-group">
+                                        <label>Thời gian bắt đầu</label>
+                                        <input type="datetime-local" class="form-control" id="examStartTime">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Thời gian làm bài (phút) <span class="required">*</span></label>
+                                    <input type="number" class="form-control" id="examDuration" placeholder="Ví dụ: 60" min="1" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Phòng thi</label>
+                                    <input type="text" class="form-control" id="examRoom" placeholder="Ví dụ: P.301 - A2">
+                                </div>
+                                <div class="form-group">
+                                    <label>Mô tả</label>
+                                    <textarea class="form-control" id="examDescription" placeholder="Mô tả kỳ thi..." rows="3"></textarea>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Questions Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-question-circle"></i> Danh sách Câu hỏi</h3>
+                            <div class="btn-group">
+                                <button class="btn btn-primary btn-sm" onclick="openAddQuestionModal()">
+                                    <i class="fas fa-plus"></i> Thêm câu hỏi
+                                </button>
+                                <label class="btn btn-success btn-sm" for="excelFileInput">
+                                    <i class="fas fa-file-excel"></i> Nhập từ Excel
+                                </label>
+                                <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" style="display:none;" onchange="handleExcelImport(event)">
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Excel format guide -->
+                            <div class="alert alert-info mb-2" id="excelGuide">
+                                <i class="fas fa-info-circle"></i>
+                                <div>
+                                    <strong>Định dạng file Excel:</strong><br>
+                                    Cột A: Câu hỏi | Cột B: Đáp án A | Cột C: Đáp án B | Cột D: Đáp án C | Cột E: Đáp án D | Cột F: Đáp án đúng (A/B/C/D) | Cột G: Giải thích (tùy chọn)
+                                </div>
+                            </div>
+
+                            <div id="questionsList">
+                                <!-- Rendered by JS -->
+                            </div>
+
+                            <div class="empty-state" id="emptyQuestions">
+                                <i class="fas fa-inbox"></i>
+                                <p>Chưa có câu hỏi nào. Hãy thêm câu hỏi hoặc nhập từ file Excel.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="form-actions">
+                        <button class="btn btn-outline" onclick="resetExamForm()">
+                            <i class="fas fa-undo"></i> Đặt lại
+                        </button>
+                        <button class="btn btn-primary btn-lg" onclick="saveExam()">
+                            <i class="fas fa-save"></i> Lưu Kỳ thi
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="student-list">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-users"></i> Danh sách tài khoản sinh viên</h3>
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" class="form-control" id="searchStudent" placeholder="Tìm theo tên hoặc MSSV...">
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>STT</th>
+                                            <th>MSSV</th>
+                                            <th>Họ tên</th>
+                                            <th>Lớp</th>
+                                            <th>Số lượt thi</th>
+                                            <th>Điểm TB</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="studentTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal: Thêm/Sửa câu hỏi -->
+    <div class="modal-overlay" id="questionModal">
+        <div class="modal" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3 id="questionModalTitle">Thêm câu hỏi mới</h3>
+                <button class="modal-close" onclick="closeQuestionModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editQuestionIndex" value="-1">
+                <div class="form-group">
+                    <label>Nội dung câu hỏi <span class="required">*</span></label>
+                    <textarea class="form-control" id="questionContent" rows="3" placeholder="Nhập nội dung câu hỏi..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Các đáp án <span class="required">*</span></label>
+                    <div class="answer-options">
+                        <div class="answer-option">
+                            <input type="radio" name="correctAnswer" value="A" id="correctA">
+                            <label for="correctA" class="answer-label">A</label>
+                            <input type="text" class="form-control" id="answerA" placeholder="Đáp án A">
+                        </div>
+                        <div class="answer-option">
+                            <input type="radio" name="correctAnswer" value="B" id="correctB">
+                            <label for="correctB" class="answer-label">B</label>
+                            <input type="text" class="form-control" id="answerB" placeholder="Đáp án B">
+                        </div>
+                        <div class="answer-option">
+                            <input type="radio" name="correctAnswer" value="C" id="correctC">
+                            <label for="correctC" class="answer-label">C</label>
+                            <input type="text" class="form-control" id="answerC" placeholder="Đáp án C">
+                        </div>
+                        <div class="answer-option">
+                            <input type="radio" name="correctAnswer" value="D" id="correctD">
+                            <label for="correctD" class="answer-label">D</label>
+                            <input type="text" class="form-control" id="answerD" placeholder="Đáp án D">
+                        </div>
+                    </div>
+                    <small class="text-secondary">Chọn radio button để đánh dấu đáp án đúng</small>
+                </div>
+                <div class="form-group">
+                    <label>Giải thích (tùy chọn)</label>
+                    <textarea class="form-control" id="questionExplanation" rows="2" placeholder="Giải thích đáp án đúng..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeQuestionModal()">Hủy</button>
+                <button class="btn btn-primary" onclick="saveQuestion()">
+                    <i class="fas fa-check"></i> Lưu câu hỏi
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Xác nhận xóa -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle text-danger"></i> Xác nhận xóa</h3>
+                <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            <div class="modal-body text-center">
+                <p id="deleteMessage">Bạn có chắc chắn muốn xóa mục này?</p>
+                <p class="text-secondary mt-1">Hành động này không thể hoàn tác.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeDeleteModal()">Hủy</button>
+                <button class="btn btn-danger" id="confirmDeleteBtn" onclick="confirmDelete()">
+                    <i class="fas fa-trash"></i> Xóa
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="assets/js/shared-data.js"></script>
+    <script src="assets/js/exam-management.js"></script>
+</body>
+</html>

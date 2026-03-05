@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>5.1b - Trang chính người dùng</title>
+    <link rel="stylesheet" href="assets/css/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <div class="brand">PTIT - Hệ thống Thi Trắc Nghiệm</div>
+        <button id="userLogoutBtn" class="logout-link" type="button">Đăng xuất</button>
+      </div>
+    </header>
+
+    <main class="container page-section">
+      <section class="hero-card">
+        <h1>Danh sách kỳ thi</h1>
+        <p>Hiển thị kỳ thi theo loại (Luyện tập, Giữa kỳ, Cuối kỳ, ...) và phân loại theo trạng thái truy cập (Tự do hoặc Theo lịch).</p>
+      </section>
+
+      <section class="panel filters">
+        <div class="field">
+          <label for="searchExam">Tìm kỳ thi</label>
+          <input id="searchExam" type="text" placeholder="Nhập tên kỳ thi..." />
+        </div>
+        <div class="field">
+          <label for="statusFilter">Lọc trạng thái</label>
+          <select id="statusFilter">
+            <option value="all">Tất cả</option>
+            <option value="free">Tự do</option>
+            <option value="scheduled">Theo lịch</option>
+          </select>
+        </div>
+      </section>
+
+      <section>
+        <div id="examGrid" class="exam-grid"></div>
+        <p id="examEmpty" class="empty-message hidden">Không tìm thấy kỳ thi phù hợp.</p>
+      </section>
+    </main>
+
+    <script src="assets/js/shared-data.js"></script>
+    <script src="assets/js/app.js"></script>
+  </body>
+</html>

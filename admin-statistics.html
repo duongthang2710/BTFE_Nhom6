@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thống kê Admin - PTIT</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="stats-page">
+  <div class="app-container">
+    <nav class="navbar" id="navbar">
+      <div class="navbar-left">
+        <div class="navbar-brand"><div class="logo-text">PTIT - Hệ thống Thi Trắc Nghiệm</div></div>
+      </div>
+      <div class="navbar-right">
+        <a href="#" class="logout-link" data-logout="admin">Đăng xuất</a>
+      </div>
+    </nav>
+
+    <main class="main-content">
+      <div class="page-header">
+        <h1 class="page-title"><i class="fas fa-chart-line"></i> Báo cáo & Thống kê</h1>
+        <div class="btn-group">
+          <a class="btn btn-outline btn-sm" href="admin-dashboard.html"><i class="fas fa-th-large"></i> Trang quản trị</a>
+          <a class="btn btn-outline btn-sm" href="exam-management.html"><i class="fas fa-file-alt"></i> Quản lý kỳ thi</a>
+          <a class="btn btn-outline btn-sm" href="results-management.html"><i class="fas fa-users"></i> Kết quả sinh viên</a>
+          <a class="btn btn-outline btn-sm" href="admin-statistics.html"><i class="fas fa-chart-bar"></i> Thống kê</a>
+          <a href="#" class="btn btn-success btn-sm" id="exportExcelBtn"><i class="fas fa-file-excel"></i> Xuất Excel</a>
+          <a href="#" class="btn btn-primary btn-sm" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> Xuất PDF</a>
+        </div>
+      </div>
+
+      <div class="page-content">
+        <div class="card">
+          <div class="card-body d-flex gap-2 align-center" style="flex-wrap: wrap;">
+            <div style="min-width:240px; flex:1;"><label for="examFilter" class="mb-1 d-block">Kỳ thi</label><select id="examFilter" class="form-control"></select></div>
+            <div style="min-width:180px;"><label for="statusFilter" class="mb-1 d-block">Trạng thái</label><select id="statusFilter" class="form-control"><option value="all">Tất cả</option><option value="passed">Hoàn thành</option><option value="failed">Không đạt</option></select></div>
+            <div style="min-width:180px;"><label for="fromDate" class="mb-1 d-block">Từ ngày</label><input id="fromDate" type="date" class="form-control" /></div>
+            <div style="min-width:180px;"><label for="toDate" class="mb-1 d-block">Đến ngày</label><input id="toDate" type="date" class="form-control" /></div>
+            <div style="min-width:120px; align-self:flex-end;"><button id="applyStatsFilter" class="btn btn-primary">Lọc</button></div>
+          </div>
+        </div>
+
+        <div class="stat-cards">
+          <div class="card"><div class="card-header"><span class="card-title">Tổng lượt thi</span></div><div class="card-body"><div class="card-value" id="metricAttemptCount">0</div></div></div>
+          <div class="card"><div class="card-header"><span class="card-title">Tỷ lệ hoàn thành</span></div><div class="card-body"><div class="card-value" id="metricCompletion">0%</div></div></div>
+          <div class="card"><div class="card-header"><span class="card-title">Điểm trung bình</span></div><div class="card-body"><div class="card-value" id="metricAvg">0.00</div></div></div>
+        </div>
+
+        <div class="charts-grid" style="grid-template-columns: 1fr 2fr;">
+          <div class="chart-container card"><div class="card-header"><h3>Tỷ lệ hoàn thành</h3></div><div class="card-body" style="height:260px;"><canvas id="completionChart"></canvas></div></div>
+          <div class="chart-container card"><div class="card-header"><h3>Biến động điểm số</h3></div><div class="card-body" style="height:260px;"><canvas id="scoreLineChart"></canvas></div></div>
+        </div>
+
+        <div class="card mt-2"><div class="card-header"><h3>Phân phối điểm số</h3></div><div class="card-body" style="height:260px;"><canvas id="histogramChart"></canvas></div></div>
+
+        <div class="card mt-2">
+          <div class="card-header"><h3>Bảng thống kê tổng hợp</h3></div>
+          <div class="card-body">
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>STT</th>
+                    <th>Kỳ thi</th>
+                    <th>Ngày thi</th>
+                    <th>Đúng / Tổng</th>
+                    <th>Điểm</th>
+                    <th>Trạng thái</th>
+                  </tr>
+                </thead>
+                <tbody id="statsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/shared-data.js"></script>
+  <script src="assets/js/admin-statistics.js"></script>
+</body>
+</html>

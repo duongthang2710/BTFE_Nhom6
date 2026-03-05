@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>5.2a - Đăng nhập Admin</title>
+    <link rel="stylesheet" href="assets/css/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <div class="brand">PTIT - Hệ thống Thi Trắc Nghiệm</div>
+      </div>
+    </header>
+
+    <main class="container auth-page">
+      <section class="hero-card">
+        <h1>Đăng nhập quản trị viên</h1>
+        <p>Dành cho cán bộ quản trị hệ thống thi trắc nghiệm.</p>
+      </section>
+
+      <section class="auth-layout">
+        <div class="panel auth-panel">
+          <form id="adminLoginForm" class="auth-form" novalidate>
+            <h2>Đăng nhập quản trị viên</h2>
+            <label for="adminUsername">Tên đăng nhập admin</label>
+            <input id="adminUsername" type="text" placeholder="Nhập username admin" required />
+
+            <label for="adminPassword">Mật khẩu</label>
+            <input id="adminPassword" type="password" placeholder="Nhập mật khẩu" required />
+
+            <button type="submit" class="btn btn-primary">Đăng nhập Admin</button>
+            <p class="hint">Tài khoản demo: <b>admin</b> / <b>admin123</b></p>
+            <p class="switch-auth-link">Đăng nhập sinh viên? <a href="user-auth.html">Student Login</a></p>
+            <p id="adminMessage" class="form-message" aria-live="polite"></p>
+          </form>
+        </div>
+
+        
+        <div class="logo-wrap">
+          <img src="assets/images/Logo_PTIT.png" alt="Logo PTIT" class="ptit-logo" />
+        </div>
+      </section>
+    </main>
+
+    <script src="assets/js/shared-data.js"></script>
+    <script src="assets/js/app.js"></script>
+  </body>
+</html>

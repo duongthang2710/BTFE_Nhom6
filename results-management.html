@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết quả Sinh viên - Hệ thống Thi Trắc nghiệm PTIT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Navbar -->
+        <nav class="navbar" id="navbar">
+            <div class="navbar-left">
+                <div class="navbar-brand">
+                    <div>
+                        <div class="logo-text">PTIT - Hệ thống Thi Trắc Nghiệm</div>
+                    </div>
+                </div>
+            </div>
+            <div class="navbar-right">
+                <a href="#" class="logout-link" data-logout="admin">Đăng xuất</a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title"><i class="fas fa-chart-bar"></i> Kết quả Sinh viên</h1>
+                <div class="btn-group">
+                    <a class="btn btn-outline btn-sm" href="admin-dashboard.html"><i class="fas fa-th-large"></i> Trang quản trị</a>
+                    <a class="btn btn-outline btn-sm" href="exam-management.html"><i class="fas fa-file-alt"></i> Quản lý kỳ thi</a>
+                    <a class="btn btn-outline btn-sm" href="results-management.html"><i class="fas fa-users"></i> Kết quả sinh viên</a>
+                    <a class="btn btn-outline btn-sm" href="admin-statistics.html"><i class="fas fa-chart-bar"></i> Thống kê</a>
+                </div>
+            </div>
+
+            <!-- Page Content -->
+            <div class="page-content">
+                <!-- Search Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-search"></i> Tìm kiếm Sinh viên</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="search-section">
+                            <div class="search-row">
+                                <div class="search-box search-main">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" class="form-control" id="studentSearch" 
+                                           placeholder="Nhập tên hoặc mã sinh viên...">
+                                </div>
+                                <button class="btn btn-primary" onclick="searchStudent()">
+                                    <i class="fas fa-search"></i> Tìm kiếm
+                                </button>
+                            </div>
+                            <div class="search-suggestions" id="searchSuggestions">
+                                <!-- Rendered by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Student Info Section (hidden by default) -->
+                <div id="studentInfoSection" style="display: none;">
+                    <!-- Student Profile Card -->
+                    <div class="card student-profile-card">
+                        <div class="card-body">
+                            <div class="student-profile">
+                                <div class="student-avatar-large" id="studentAvatarLarge">NV</div>
+                                <div class="student-details">
+                                    <h2 id="studentFullName">--</h2>
+                                    <div class="student-meta">
+                                        <span><i class="fas fa-id-card"></i> MSV: <strong id="studentId">--</strong></span>
+                                        <span><i class="fas fa-graduation-cap"></i> Lớp: <strong id="studentClass">--</strong></span>
+                                        <span><i class="fas fa-envelope"></i> Email: <strong id="studentEmail">--</strong></span>
+                                    </div>
+                                </div>
+                                <div class="student-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-value" id="totalExams">0</div>
+                                        <div class="stat-label">Kỳ thi</div>
+                                    </div>
+                                    <div class="stat-item stat-success">
+                                        <div class="stat-value" id="passedExams">0</div>
+                                        <div class="stat-label">Đạt</div>
+                                    </div>
+                                    <div class="stat-item stat-danger">
+                                        <div class="stat-value" id="failedExams">0</div>
+                                        <div class="stat-label">Không đạt</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Exam Results Table -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-list-ol"></i> Danh sách Kỳ thi đã tham gia</h3>
+                            <button class="btn btn-success btn-sm no-print" onclick="exportStudentReport()">
+                                <i class="fas fa-print"></i> Xuất báo cáo
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>STT</th>
+                                            <th>Tên kỳ thi</th>
+                                            <th>Phòng thi</th>
+                                            <th>Ngày giờ thi</th>
+                                            <th>Thời gian làm bài</th>
+                                            <th>Số câu đúng</th>
+                                            <th>Điểm</th>
+                                            <th>Trạng thái</th>
+                                            <th class="no-print">Chi tiết</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="examResultsBody">
+                                        <!-- Rendered by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- All Students List (default view) -->
+                <div id="allStudentsSection">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-users"></i> Danh sách Sinh viên</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>STT</th>
+                                            <th>MSV</th>
+                                            <th>Họ tên</th>
+                                            <th>Lớp</th>
+                                            <th>Số kỳ thi</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="allStudentsBody">
+                                        <!-- Rendered by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="pagination" id="studentPagination">
+                                <!-- Rendered by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal: Chi tiết kết quả kỳ thi -->
+    <div class="modal-overlay" id="examDetailModal">
+        <div class="modal" style="max-width: 850px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-clipboard-check"></i> <span id="detailExamName">Chi tiết Kết quả</span></h3>
+                <button class="modal-close" onclick="closeExamDetailModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Score Summary -->
+                <div class="result-summary" id="resultSummary">
+                    <!-- Rendered by JS -->
+                </div>
+
+                <!-- Question Details -->
+                <div class="question-details" id="questionDetails">
+                    <!-- Rendered by JS -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" onclick="printExamDetail()">
+                    <i class="fas fa-print"></i> In kết quả
+                </button>
+                <button class="btn btn-outline" onclick="closeExamDetailModal()">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Section (hidden, for printing) -->
+    <div id="printSection" class="print-only"></div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="assets/js/shared-data.js"></script>
+    <script src="assets/js/student-results.js"></script>
+</body>
+</html>

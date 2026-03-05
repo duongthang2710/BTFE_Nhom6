@@ -40,6 +40,11 @@
 			justify-content: space-between;
 			gap: 16px;
 		}
+		.header-actions {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
 		.title { font-weight: 700; font-size: 20px; }
 		.sub { opacity: 0.9; font-size: 13px; margin-top: 2px; }
 		.timer {
@@ -218,7 +223,10 @@
 				<div class="title">PTIT - Hệ thống Thi Trắc Nghiệm</div>
 				<div class="sub" id="examInfo">Bài thi: Lập trình Web cơ bản</div>
 			</div>
-			<div class="timer" id="timer">20:00</div>
+			<div class="header-actions">
+				<button class="btn btn-secondary" id="homeBtn">Về trang chủ</button>
+				<div class="timer" id="timer">20:00</div>
+			</div>
 		</div>
 	</header>
 
@@ -266,61 +274,31 @@
 
 	<div class="toast" id="toast"></div>
 
+	<script src="assets/js/shared-data.js"></script>
 	<script>
+		const store = window.FE01Store;
+		const selectedExamId = Number(localStorage.getItem("fe01_selected_exam_id") || 0);
+		const selectedExam = store?.getExamById?.(selectedExamId) || (store?.getExams?.() || [])[0];
+
 		const exam = {
-			id: "PTIT-WEB-01",
-			title: "Bài thi Lập trình Web - PTIT",
-			subject: "Lập trình Web",
-			durationSec: 20 * 60
+			id: selectedExam?.id || "PTIT-EXAM",
+			title: selectedExam?.name || "Bài thi trắc nghiệm PTIT",
+			subject: selectedExam?.categoryText || "Tổng hợp",
+			durationSec: Number(selectedExam?.duration || 20) * 60
 		};
 
-		const questions = [
-			{
-				id: 1,
-				topic: "HTML",
-				text: "HTML là viết tắt của cụm nào?",
-				options: [
-					"Hyper Text Markup Language",
-					"High Tool Machine Language",
-					"Hyperlinks and Text Management Language",
-					"Home Tool Markup Language"
-				],
-				correct: 0,
-				explain: "HTML là Hyper Text Markup Language."
-			},
-			{
-				id: 2,
-				topic: "CSS",
-				text: "Thuộc tính CSS nào dùng để đổi màu chữ?",
-				options: ["font-color", "text-color", "color", "foreground"],
-				correct: 2,
-				explain: "Thuộc tính đúng là color."
-			},
-			{
-				id: 3,
-				topic: "JavaScript",
-				text: "Phương thức nào lấy phần tử theo id?",
-				options: ["getElementById", "queryById", "selectById", "findElement"],
-				correct: 0,
-				explain: "Dùng document.getElementById()."
-			},
-			{
-				id: 4,
-				topic: "HTML",
-				text: "Thẻ nào dùng để tạo liên kết?",
-				options: ["<link>", "<a>", "<href>", "<url>"],
-				correct: 1,
-				explain: "Thẻ anchor <a> tạo hyperlink."
-			},
-			{
-				id: 5,
-				topic: "JavaScript",
-				text: "Khai báo nào hợp lệ trong ES6?",
-				options: ["var", "let", "const", "Cả 3 đáp án"],
-				correct: 3,
-				explain: "ES6 hỗ trợ var, let và const."
-			}
-		];
+		const questions = (selectedExam?.questions || []).map((q, index) => {
+			const options = [q.answers?.A, q.answers?.B, q.answers?.C, q.answers?.D];
+			const correctIndex = ["A", "B", "C", "D"].indexOf(q.correct);
+			return {
+				id: index + 1,
+				topic: exam.subject,
+				text: q.content,
+				options,
+				correct: correctIndex >= 0 ? correctIndex : 0,
+				explain: q.explanation || ""
+			};
+		});
 
 		let current = 0;
 		let answers = {};
@@ -338,6 +316,15 @@
 
 		document.getElementById("examInfo").textContent = `Bài thi: ${exam.title}`;
 		totalCountEl.textContent = questions.length;
+
+		if (questions.length === 0) {
+			questionCard.innerHTML = `
+				<div class="question-body">
+					<p class="question-text">Bài thi này chưa có câu hỏi. Vui lòng quay lại trang quản trị để thêm câu hỏi.</p>
+				</div>
+			`;
+			document.getElementById("submitBtn").disabled = true;
+		}
 
 		function formatTime(totalSec) {
 			const m = Math.floor(totalSec / 60).toString().padStart(2, "0");
@@ -476,6 +463,36 @@
 			};
 
 			localStorage.setItem("fe01_exam_result", JSON.stringify(result));
+
+			const currentStudentId = localStorage.getItem("fe01_current_student_id") || "B21DCCN001";
+			const studentResult = {
+				examId: exam.id,
+				examName: exam.title,
+				date: new Date().toLocaleString("vi-VN"),
+				room: selectedExam?.room || "Trực tuyến",
+				timeSpent: `${Math.max(1, Math.ceil(result.timeUsedSec / 60))} phút`,
+				totalQuestions: result.totalQuestions,
+				correctAnswers: result.correct,
+				score: result.score10,
+				status: result.score10 >= 5 ? "passed" : "failed",
+				questions: detail.map(item => ({
+					content: item.text,
+					answers: {
+						A: item.options[0],
+						B: item.options[1],
+						C: item.options[2],
+						D: item.options[3]
+					},
+					correct: ["A", "B", "C", "D"][item.correctAnswer] || "A",
+					selected: item.selectedAnswer === null ? "" : ["A", "B", "C", "D"][item.selectedAnswer],
+					explanation: item.explain || ""
+				}))
+			};
+
+			if (store?.appendResult) {
+				store.appendResult(currentStudentId, studentResult);
+			}
+
 			return result;
 		}
 
@@ -530,14 +547,18 @@
 		document.getElementById("goResultBtn").addEventListener("click", () => {
 			window.location.href = "results.html";
 		});
+		document.getElementById("homeBtn").addEventListener("click", () => {
+			window.location.href = "user-home.html";
+		});
 
-		renderQuestion();
-		renderGrid();
-		renderProgress();
-		updateTimer();
-		timer = setInterval(updateTimer, 1000);
-
-		showToast("Bài thi đã sẵn sàng");
+		if (questions.length > 0) {
+			renderQuestion();
+			renderGrid();
+			renderProgress();
+			updateTimer();
+			timer = setInterval(updateTimer, 1000);
+			showToast("Bài thi đã sẵn sàng");
+		}
 	</script>
 </body>
 </html>

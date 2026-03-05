@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Admin - PTIT</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <nav class="navbar" id="navbar">
+      <div class="navbar-left">
+        <div class="navbar-brand"><div class="logo-text">PTIT - Hệ thống Thi Trắc Nghiệm</div></div>
+      </div>
+      <div class="navbar-right">
+        <a href="#" class="logout-link" data-logout="admin">Đăng xuất</a>
+      </div>
+    </nav>
+
+    <main class="main-content">
+      <div class="page-header">
+        <h1 class="page-title"><i class="fas fa-th-large"></i> Trang quản trị</h1>
+        <div class="btn-group">
+          <a class="btn btn-outline btn-sm" href="admin-dashboard.html"><i class="fas fa-th-large"></i> Trang quản trị</a>
+          <a class="btn btn-outline btn-sm" href="exam-management.html"><i class="fas fa-file-alt"></i> Quản lý kỳ thi</a>
+          <a class="btn btn-outline btn-sm" href="results-management.html"><i class="fas fa-users"></i> Kết quả sinh viên</a>
+          <a class="btn btn-outline btn-sm" href="admin-statistics.html"><i class="fas fa-chart-bar"></i> Thống kê</a>
+        </div>
+      </div>
+
+      <div class="page-content">
+        <div class="stat-cards">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Tổng sinh viên</span><div class="card-icon icon-red"><i class="fas fa-user-graduate"></i></div></div>
+            <div class="card-body"><div class="card-value" id="metricStudents">0</div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Tổng kỳ thi</span><div class="card-icon icon-blue"><i class="fas fa-file-alt"></i></div></div>
+            <div class="card-body"><div class="card-value" id="metricExams">0</div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Tổng lượt thi</span><div class="card-icon icon-orange"><i class="fas fa-clipboard-list"></i></div></div>
+            <div class="card-body"><div class="card-value" id="metricAttempts">0</div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Điểm trung bình</span><div class="card-icon icon-green"><i class="fas fa-star"></i></div></div>
+            <div class="card-body"><div class="card-value" id="metricAvgScore">0.00</div></div>
+          </div>
+        </div>
+
+        <div class="charts-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="card">
+            <div class="card-header d-flex justify-between align-center">
+              <h3><i class="fas fa-file-alt"></i> Quản lý danh sách kỳ thi</h3>
+              <a class="btn btn-primary btn-sm" href="exam-management.html?tab=create-exam"><i class="fas fa-plus"></i> Thêm mới</a>
+            </div>
+            <div class="card-body">
+              <div class="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>STT</th>
+                      <th>Tên kỳ thi</th>
+                      <th>Loại</th>
+                      <th>Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody id="manageExamBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header d-flex justify-between align-center">
+              <h3><i class="fas fa-users"></i> Quản lý danh sách người dùng</h3>
+              <button type="button" class="btn btn-primary btn-sm" onclick="openStudentModal()"><i class="fas fa-plus"></i> Thêm mới</button>
+            </div>
+            <div class="card-body">
+              <div class="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>STT</th>
+                      <th>MSSV</th>
+                      <th>Họ tên</th>
+                      <th>Lớp</th>
+                      <th>Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody id="manageStudentBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="charts-grid">
+          <div class="chart-container card">
+            <div class="card-header"><h3>Lượt tham gia theo kỳ thi</h3></div>
+            <div class="card-body" style="height: 280px;"><canvas id="participationChart"></canvas></div>
+          </div>
+          <div class="chart-container card">
+            <div class="card-header"><h3>Tỷ lệ hoàn thành</h3></div>
+            <div class="card-body" style="height: 280px;"><canvas id="gradeChart"></canvas></div>
+          </div>
+        </div>
+
+        <div class="card mt-2">
+          <div class="card-header"><h3>Xu hướng lượt thi</h3></div>
+          <div class="card-body" style="height: 250px;"><canvas id="trendChart"></canvas></div>
+        </div>
+
+        <div class="card mt-2">
+          <div class="card-header"><h3><i class="fas fa-list"></i> Danh sách kỳ thi</h3></div>
+          <div class="card-body">
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>STT</th>
+                    <th>Tên kỳ thi</th>
+                    <th>Nhóm kỳ thi</th>
+                    <th>Lượt tham gia</th>
+                    <th>Trạng thái</th>
+                  </tr>
+                </thead>
+                <tbody id="ongoingExamBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-overlay" id="studentCrudModal">
+    <div class="modal" style="max-width: 560px;">
+      <div class="modal-header">
+        <h3 id="studentModalTitle">Thêm sinh viên</h3>
+        <button class="modal-close" onclick="closeStudentModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="studentEditId" value="" />
+        <div class="form-group">
+          <label for="studentNameInput">Họ tên</label>
+          <input id="studentNameInput" class="form-control" type="text" placeholder="Nguyễn Văn A" />
+        </div>
+        <div class="form-group">
+          <label for="studentClassInput">Lớp</label>
+          <input id="studentClassInput" class="form-control" type="text" placeholder="D21CQCN01-B" />
+        </div>
+        <div class="form-group">
+          <label for="studentEmailInput">Email</label>
+          <input id="studentEmailInput" class="form-control" type="email" placeholder="sv@ptit.edu.vn" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeStudentModal()">Hủy</button>
+        <button class="btn btn-primary" onclick="saveStudentFromDashboard()">Lưu</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/shared-data.js"></script>
+  <script src="assets/js/admin-dashboard.js"></script>
+</body>
+</html>

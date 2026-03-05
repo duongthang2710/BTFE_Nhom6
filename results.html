@@ -175,6 +175,7 @@
         </section>
     </main>
 
+    <script src="assets/js/shared-data.js"></script>
     <script>
         const raw = localStorage.getItem("fe01_exam_result");
         const result = raw ? JSON.parse(raw) : null;
@@ -189,7 +190,7 @@
                 <section class="card empty" style="grid-column:1 / -1;">
                     <h3>Chưa có kết quả để hiển thị</h3>
                     <p>Vui lòng làm bài thi trước khi xem trang kết quả.</p>
-                    <button class="btn btn-primary" onclick="location.href='index.html'">Làm bài ngay</button>
+                    <button class="btn btn-primary" onclick="location.href='user-home.html'">Về trang chính</button>
                 </section>
             `;
         } else {
@@ -205,7 +206,7 @@
                 <div class="row"><span>Thời gian làm bài</span><strong>${Math.max(1, Math.ceil(result.timeUsedSec / 60))} phút</strong></div>
                 <div class="row"><span>Trạng thái</span><strong>${result.submitReason}</strong></div>
                 <div class="btns">
-                    <button class="btn btn-secondary" onclick="location.href='index.html'">Làm lại</button>
+                    <button class="btn btn-secondary" onclick="location.href='user-home.html'">Làm bài khác</button>
                     <button class="btn btn-primary" onclick="window.print()">In kết quả</button>
                 </div>
             `;
@@ -221,7 +222,12 @@
                 `;
             }).join("");
 
-            const classStats = result.classStats || { averagePercent: 0, maxPercent: 0, minPercent: 0 };
+            const dashboard = window.FE01Store?.getDashboardStats?.() || {};
+            const classStats = result.classStats || {
+                averagePercent: dashboard.avgScore ? Math.round((dashboard.avgScore / 10) * 100) : 0,
+                maxPercent: 100,
+                minPercent: 0
+            };
             stats.innerHTML = `
                 <div class="stat-box">
                     <div><strong>So sánh lớp</strong></div>
