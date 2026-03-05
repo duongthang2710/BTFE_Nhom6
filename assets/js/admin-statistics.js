@@ -4,6 +4,11 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
+  const adminHeaderInfo = document.getElementById("adminHeaderInfo");
+  if (adminHeaderInfo) {
+    adminHeaderInfo.textContent = "Quản trị viên - AD001";
+  }
+
   document.getElementById("menuToggle")?.addEventListener("click", () => {
     document.getElementById("navbarNav")?.classList.toggle("mobile-open");
   });

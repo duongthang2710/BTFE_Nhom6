@@ -99,19 +99,19 @@
 
   const defaultStudents = [
     {
-      id: "B21DCCN001",
+      id: "B23DCCN001",
       name: "Nguyễn Văn An",
-      class: "D21CQCN01-B",
-      email: "annv.b21cn001@stu.ptit.edu.vn",
+      class: "D23CQCN01-B",
+      email: "annv.b23cn001@stu.ptit.edu.vn",
       avatar: "NA",
       username: "student",
       password: "123456",
     },
     {
-      id: "B21DCCN002",
+      id: "B23DCCN002",
       name: "Trần Thị Bình",
-      class: "D21CQCN01-B",
-      email: "binhtt.b21cn002@stu.ptit.edu.vn",
+      class: "D23CQCN01-B",
+      email: "binhtt.b23cn002@stu.ptit.edu.vn",
       avatar: "TB",
       username: "binh",
       password: "123456",
@@ -119,7 +119,7 @@
   ];
 
   const defaultResults = {
-    B21DCCN001: [
+    B23DCCN001: [
       {
         examId: 2,
         examName: "Thi giữa kỳ Cơ sở dữ liệu",
@@ -153,7 +153,7 @@
         ],
       },
     ],
-    B21DCCN002: [],
+    B23DCCN002: [],
   };
 
   const safeParse = (value, fallback) => {
@@ -175,6 +175,56 @@
       write(KEYS.students, defaultStudents);
     if (!localStorage.getItem(KEYS.results))
       write(KEYS.results, defaultResults);
+
+    reconcileSampleStudents();
+  };
+
+  const reconcileSampleStudents = () => {
+    const students = read(KEYS.students, defaultStudents);
+    const results = read(KEYS.results, defaultResults);
+    const byUsername = Object.fromEntries(
+      defaultStudents.map((student) => [student.username, student]),
+    );
+    const idMap = {};
+
+    const nextStudents = students.map((student) => {
+      const sample = byUsername[student.username];
+      if (!sample) return student;
+
+      if (student.id && student.id !== sample.id) {
+        idMap[student.id] = sample.id;
+      }
+
+      return {
+        ...student,
+        id: sample.id,
+        name: sample.name,
+        class: sample.class,
+        email: sample.email,
+        avatar: sample.avatar,
+        password: sample.password,
+      };
+    });
+
+    if (Object.keys(idMap).length > 0) {
+      const nextResults = {};
+      Object.entries(results || {}).forEach(([studentId, attempts]) => {
+        const mappedId = idMap[studentId] || studentId;
+        if (!nextResults[mappedId]) nextResults[mappedId] = [];
+        nextResults[mappedId] = nextResults[mappedId].concat(attempts || []);
+      });
+      write(KEYS.results, nextResults);
+
+      const currentStudentId = localStorage.getItem("fe01_current_student_id");
+      if (currentStudentId && idMap[currentStudentId]) {
+        localStorage.setItem(
+          "fe01_current_student_id",
+          idMap[currentStudentId],
+        );
+      }
+    }
+
+    write(KEYS.students, nextStudents);
   };
 
   const toLetter = (index) => ["A", "B", "C", "D"][index] || "A";

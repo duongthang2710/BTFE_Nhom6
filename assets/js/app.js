@@ -1,6 +1,7 @@
 (function () {
   const clearUserSession = () => {
     localStorage.removeItem("fe01_current_student_id");
+    localStorage.removeItem("fe01_current_student_username");
     localStorage.removeItem("fe01_selected_exam_id");
   };
 
@@ -83,19 +84,16 @@
 
       if (found) {
         localStorage.setItem("fe01_current_student_id", found.id);
+        localStorage.setItem("fe01_current_student_username", found.username);
         clearAdminSession();
-        showMessage(message, "Đăng nhập thành công (demo).", "success");
+        showMessage(message, "Đăng nhập thành công.", "success");
         setTimeout(() => {
           window.location.href = "user-home.html";
         }, 600);
         return;
       }
 
-      showMessage(
-        message,
-        "Sai thông tin đăng nhập. Thử student / 123456.",
-        "error",
-      );
+      showMessage(message, "Sai thông tin đăng nhập.", "error");
     });
 
     registerForm.addEventListener("submit", (event) => {
@@ -153,12 +151,12 @@
       }
 
       const nextIndex = students.length + 1;
-      const studentId = `B21DCCN${String(nextIndex).padStart(3, "0")}`;
+      const studentId = `B23DCCN${String(nextIndex).padStart(3, "0")}`;
       const username = email.split("@")[0].toLowerCase();
       store?.addStudent?.({
         id: studentId,
         name,
-        class: "D21CQCN01-B",
+        class: "D23CQCN01-B",
         email,
         avatar: name
           .split(" ")
@@ -184,7 +182,34 @@
     const statusFilter = document.getElementById("statusFilter");
     const emptyMessage = document.getElementById("examEmpty");
     const logoutButton = document.getElementById("userLogoutBtn");
+    const userHeaderInfo = document.getElementById("userHeaderInfo");
     const store = getStore();
+
+    const students = store?.getStudents?.() || [];
+    const currentStudentUsername =
+      localStorage.getItem("fe01_current_student_username") || "";
+    const currentStudentId =
+      localStorage.getItem("fe01_current_student_id") || "";
+
+    const currentStudent =
+      students.find((student) => student.username === currentStudentUsername) ||
+      students.find((student) => student.id === currentStudentId);
+
+    if (currentStudent && currentStudent.id !== currentStudentId) {
+      localStorage.setItem("fe01_current_student_id", currentStudent.id);
+    }
+    if (currentStudent && currentStudent.username !== currentStudentUsername) {
+      localStorage.setItem(
+        "fe01_current_student_username",
+        currentStudent.username,
+      );
+    }
+
+    if (userHeaderInfo) {
+      userHeaderInfo.textContent = currentStudent
+        ? `${currentStudent.name} - ${currentStudent.id}`
+        : "Sinh viên - --";
+    }
 
     logoutButton?.addEventListener("click", () => {
       clearUserSession();
@@ -252,18 +277,14 @@
 
       if (username === "admin" && password === "admin123") {
         localStorage.setItem("fe01_admin_logged_in", "true");
-        showMessage(message, "Đăng nhập admin thành công (demo).", "success");
+        showMessage(message, "Đăng nhập admin thành công.", "success");
         setTimeout(() => {
           window.location.href = "admin-dashboard.html";
         }, 600);
         return;
       }
 
-      showMessage(
-        message,
-        "Sai tài khoản admin demo. Thử admin / admin123.",
-        "error",
-      );
+      showMessage(message, "Sai tài khoản admin.", "error");
     });
   };
 

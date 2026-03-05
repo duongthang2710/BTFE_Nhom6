@@ -895,6 +895,26 @@ table tbody tr:last-child td {
     color: var(--ptit-red);
 }
 
+.header-account {
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    color: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.topbar-inner .header-account {
+    margin-left: auto;
+    margin-right: 10px;
+}
+
+.navbar-right .header-account {
+    margin-right: 2px;
+}
+
 .page-section,
 .auth-page {
     padding: 28px 0 40px;
@@ -1190,6 +1210,11 @@ table tbody tr:last-child td {
         padding: 10px 15px;
     }
 
+    .header-account {
+        font-size: 0.8rem;
+        padding: 6px 10px;
+    }
+
     .card-body {
         padding: 16px;
     }
@@ -1200,6 +1225,12 @@ table tbody tr:last-child td {
 }
 
 @media (max-width: 480px) {
+
+    .topbar-inner .header-account,
+    .navbar-right .header-account {
+        display: none;
+    }
+
     .btn-group {
         flex-direction: column;
     }

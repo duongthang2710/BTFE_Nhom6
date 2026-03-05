@@ -8,12 +8,20 @@ const getExams = () => store.getExams();
 const setExams = (exams) => store.setExams(exams);
 
 document.addEventListener("DOMContentLoaded", function () {
+  renderAdminHeaderInfo();
   setupLogout();
   renderExamTable();
   renderStudentsTable();
   setupEventListeners();
   applyInitialRouteParams();
 });
+
+function renderAdminHeaderInfo() {
+  const adminHeaderInfo = document.getElementById("adminHeaderInfo");
+  if (adminHeaderInfo) {
+    adminHeaderInfo.textContent = "Quản trị viên - AD001";
+  }
+}
 
 function applyInitialRouteParams() {
   const params = new URLSearchParams(window.location.search);

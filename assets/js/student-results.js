@@ -2,6 +2,7 @@ const store = window.FE01Store;
 let selectedStudent = null;
 
 document.addEventListener("DOMContentLoaded", function () {
+  renderAdminHeaderInfo();
   setupLogout();
   renderAllStudents();
   setupEventListeners();
@@ -13,6 +14,13 @@ document.addEventListener("DOMContentLoaded", function () {
     if (student) selectStudent(student.id);
   }
 });
+
+function renderAdminHeaderInfo() {
+  const adminHeaderInfo = document.getElementById("adminHeaderInfo");
+  if (adminHeaderInfo) {
+    adminHeaderInfo.textContent = "Quản trị viên - AD001";
+  }
+}
 
 function setupLogout() {
   const logout = document.querySelector('[data-logout="admin"]');

@@ -4,6 +4,11 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
+  const adminHeaderInfo = document.getElementById("adminHeaderInfo");
+  if (adminHeaderInfo) {
+    adminHeaderInfo.textContent = "Quản trị viên - AD001";
+  }
+
   document.getElementById("menuToggle")?.addEventListener("click", () => {
     document.getElementById("navbarNav")?.classList.toggle("mobile-open");
   });
@@ -256,7 +261,7 @@ function saveStudentFromDashboard() {
     }
   } else {
     const nextIndex = students.length + 1;
-    const studentId = `B21DCCN${String(nextIndex).padStart(3, "0")}`;
+    const studentId = `B23DCCN${String(nextIndex).padStart(3, "0")}`;
     students.push({
       id: studentId,
       name,
