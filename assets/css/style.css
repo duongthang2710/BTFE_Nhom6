@@ -113,7 +113,7 @@ img {
 }
 
 .navbar-brand .logo-text {
-    font-size: 17px;
+    font-size: 22px;
     font-weight: 800;
     letter-spacing: 0.3px;
     color: var(--text-white);
@@ -124,7 +124,7 @@ img {
 
 .navbar-brand .logo-text::after {
     content: "Nền tảng thi trực tuyến";
-    font-size: 10px;
+    font-size: 15px;
     font-weight: 500;
     letter-spacing: 0.2px;
     color: rgba(255, 255, 255, 0.8);
@@ -864,7 +864,7 @@ table tbody tr:last-child td {
 }
 
 .brand {
-    font-size: 1.1rem;
+    font-size: 22px;
     font-weight: 700;
     letter-spacing: 0.2px;
     display: flex;
@@ -874,7 +874,7 @@ table tbody tr:last-child td {
 
 .brand::after {
     content: "Nền tảng thi trực tuyến";
-    font-size: 0.75rem;
+    font-size: 15px;
     font-weight: 500;
     color: rgba(255, 255, 255, 0.85);
 }
